@@ -75,8 +75,6 @@
 #ifndef MFRC522_h
 #define MFRC522_h
 
-#include "require_cpp11.h"
-#include "deprecated.h"
 // Enable integer limits
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
@@ -331,7 +329,7 @@ public:
 	// Functions for setting up the Arduino
 	/////////////////////////////////////////////////////////////////////////////////////
 	MFRC522(const byte chipSelectPin, const byte resetPowerDownPin,
-			SPIClass *spiClass = &SPI, const SPISettings spiSettings = SPISettings(SPI_CLOCK_DIV4, MSBFIRST, SPI_MODE0))
+			SPIClass spiClass = SPI, const SPISettings spiSettings = SPISettings(SPI_CLOCK_DIV4, MSBFIRST, SPI_MODE0))
 			: _chipSelectPin(chipSelectPin), _resetPowerDownPin(resetPowerDownPin),
 			  _spiClass(spiClass), _spiSettings(spiSettings) {};
 	MFRC522() : MFRC522(UNUSED_PIN, UNUSED_PIN) {};
@@ -351,7 +349,8 @@ public:
 	// Functions for manipulating the MFRC522
 	/////////////////////////////////////////////////////////////////////////////////////
 	void PCD_Init();
-	void PCD_Init(byte chipSelectPin, byte resetPowerDownPin);
+	void PCD_End();
+	void PCD_Init(byte chipSelectPin, byte resetPowerDownPin, SPIClass spiClass);
 	void PCD_Reset();
 	void PCD_AntennaOn();
 	void PCD_AntennaOff();
@@ -420,12 +419,13 @@ public:
 	virtual bool PICC_ReadCardSerial();
 	
 protected:
+	bool _started = false;
 	// Pins
 	byte _chipSelectPin;		// Arduino pin connected to MFRC522's SPI slave select input (Pin 24, NSS, active low)
 	byte _resetPowerDownPin;	// Arduino pin connected to MFRC522's reset and power down input (Pin 6, NRSTPD, active low)
 	
 	// SPI communication
-	SPIClass *_spiClass;		// SPI class which abstracts hardware.
+	SPIClass _spiClass;		// SPI class which abstracts hardware.
 	const SPISettings _spiSettings;	// SPI settings.
 	
 	// Functions for communicating with MIFARE PICCs
