@@ -329,11 +329,11 @@ public:
 	// Functions for setting up the Arduino
 	/////////////////////////////////////////////////////////////////////////////////////
 	MFRC522(const byte chipSelectPin, const byte resetPowerDownPin,
-			SPIClass spiClass = SPI, const SPISettings spiSettings = SPISettings(SPI_CLOCK_DIV4, MSBFIRST, SPI_MODE0))
+			SPIClass* spiClass = &SPI, const SPISettings spiSettings = SPISettings(SPI_CLOCK_DIV4, MSBFIRST, SPI_MODE0))
 			: _chipSelectPin(chipSelectPin), _resetPowerDownPin(resetPowerDownPin),
 			  _spiClass(spiClass), _spiSettings(spiSettings) {};
 	MFRC522() : MFRC522(UNUSED_PIN, UNUSED_PIN) {};
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Basic interface functions for communicating with the MFRC522
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -344,26 +344,26 @@ public:
 	void PCD_SetRegisterBitMask(PCD_Register reg, byte mask);
 	void PCD_ClearRegisterBitMask(PCD_Register reg, byte mask);
 	StatusCode PCD_CalculateCRC(byte *data, byte length, byte *result);
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Functions for manipulating the MFRC522
 	/////////////////////////////////////////////////////////////////////////////////////
 	void PCD_Init();
 	void PCD_End();
-	void PCD_Init(byte chipSelectPin, byte resetPowerDownPin, SPIClass spiClass);
+	void PCD_Init(byte chipSelectPin, byte resetPowerDownPin, SPIClass* spiClass);
 	void PCD_Reset();
 	void PCD_AntennaOn();
 	void PCD_AntennaOff();
 	byte PCD_GetAntennaGain();
 	void PCD_SetAntennaGain(byte mask);
 	bool PCD_PerformSelfTest();
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Power control functions
 	/////////////////////////////////////////////////////////////////////////////////////
 	void PCD_SoftPowerDown();
 	void PCD_SoftPowerUp();
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Functions for communicating with PICCs
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -390,17 +390,17 @@ public:
 	StatusCode MIFARE_GetValue(byte blockAddr, int32_t *value);
 	StatusCode MIFARE_SetValue(byte blockAddr, int32_t value);
 	StatusCode PCD_NTAG216_AUTH(byte *passWord, byte pACK[]);
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Support functions
 	/////////////////////////////////////////////////////////////////////////////////////
 	StatusCode PCD_MIFARE_Transceive(byte *sendData, byte sendLen, bool acceptTimeout = false);
 	static PICC_Type PICC_GetType(byte sak);
-	
+
 	// Support functions for debuging - proxy for MFRC522Debug to keep backwarts compatibility
 	static const __FlashStringHelper *GetStatusCodeName(StatusCode code);
 	static const __FlashStringHelper *PICC_GetTypeName(PICC_Type type);
-	
+
 	// Support functions for debuging
 	void PCD_DumpVersionToSerial();
 	void PICC_DumpToSerial(Uid *uid);
@@ -408,24 +408,24 @@ public:
 	void PICC_DumpMifareClassicToSerial(Uid *uid, PICC_Type piccType, MIFARE_Key *key);
 	void PICC_DumpMifareClassicSectorToSerial(Uid *uid, MIFARE_Key *key, byte sector);
 	void PICC_DumpMifareUltralightToSerial();
-	
+
 	// Advanced functions for MIFARE
 	void MIFARE_SetAccessBits(byte *accessBitBuffer, byte g0, byte g1, byte g2, byte g3);
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Convenience functions - does not add extra functionality
 	/////////////////////////////////////////////////////////////////////////////////////
 	virtual bool PICC_IsNewCardPresent();
 	virtual bool PICC_ReadCardSerial();
-	
+
 protected:
 	bool _started = false;
 	// Pins
 	byte _chipSelectPin;		// Arduino pin connected to MFRC522's SPI slave select input (Pin 24, NSS, active low)
 	byte _resetPowerDownPin;	// Arduino pin connected to MFRC522's reset and power down input (Pin 6, NRSTPD, active low)
-	
+
 	// SPI communication
-	SPIClass _spiClass;		// SPI class which abstracts hardware.
+	SPIClass* _spiClass;		// SPI class which abstracts hardware.
 	const SPISettings _spiSettings;	// SPI settings.
 	
 	// Functions for communicating with MIFARE PICCs
